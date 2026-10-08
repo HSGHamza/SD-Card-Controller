@@ -27,6 +27,8 @@ wire [6:0] response_crc;
 
 wire sd_cmd;
 
+wire [2:0] response_type;
+
 reg card_cmd_oe;
 reg card_cmd_out;
 
@@ -50,6 +52,7 @@ SD_init uut_init (
     .cmd_crc7(cmd_crc7),
     .cmd_start(cmd_start),
     .response_start(response_start),
+    .response_type(response_type),
 
     .cmd_busy(cmd_busy),
     .cmd_done(cmd_done),
@@ -79,12 +82,15 @@ sd_response uut_response (
     .reset(reset),
     .response_start(response_start),
     .cmd(sd_cmd),
+    .response_type(response_type),
+
     .response_busy(response_busy),
     .response_done(response_done),
     .response_valid(response_valid),
     .response_cmd(response_cmd),
     .response_status(response_status),
-    .response_crc(response_crc)
+    .response_crc(response_crc),
+    .response_long()
 );
 
 always #1250 sd_clk = ~sd_clk;

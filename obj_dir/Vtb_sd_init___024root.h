@@ -31,6 +31,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_sd_init___024root final : public Verilate
     CData/*5:0*/ tb_sd_init__DOT__response_cmd;
     CData/*6:0*/ tb_sd_init__DOT__response_crc;
     CData/*0:0*/ tb_sd_init__DOT__sd_cmd;
+    CData/*2:0*/ tb_sd_init__DOT__response_type;
     CData/*0:0*/ tb_sd_init__DOT__card_cmd_oe;
     CData/*0:0*/ tb_sd_init__DOT__card_cmd_out;
     CData/*0:0*/ tb_sd_init__DOT____Vlvbound_h8e7b2171__0;
@@ -41,8 +42,9 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_sd_init___024root final : public Verilate
     CData/*0:0*/ tb_sd_init__DOT__uut_cmd__DOT__cmd_out;
     CData/*0:0*/ tb_sd_init__DOT__uut_cmd__DOT__cmd_oe;
     CData/*1:0*/ tb_sd_init__DOT__uut_cmd__DOT__state;
-    CData/*5:0*/ tb_sd_init__DOT__uut_response__DOT__counter;
     CData/*1:0*/ tb_sd_init__DOT__uut_response__DOT__state;
+    CData/*7:0*/ tb_sd_init__DOT__uut_response__DOT__counter;
+    CData/*2:0*/ tb_sd_init__DOT__uut_response__DOT__active_response_type;
     CData/*0:0*/ __VstlFirstIteration;
     CData/*0:0*/ __Vtrigprevexpr___TOP__tb_sd_init__DOT__sd_clk__0;
     CData/*0:0*/ __Vtrigprevexpr___TOP__tb_sd_init__DOT__cmd_busy__0;
@@ -54,12 +56,12 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_sd_init___024root final : public Verilate
     IData/*31:0*/ tb_sd_init__DOT__cmd_arg;
     IData/*31:0*/ tb_sd_init__DOT__response_status;
     IData/*31:0*/ tb_sd_init__DOT__acmd41_count;
+    VlWide<5>/*135:0*/ tb_sd_init__DOT__uut_response__DOT__response_shift_reg;
+    VlWide<5>/*135:0*/ tb_sd_init__DOT__uut_response__DOT__response_next;
     IData/*31:0*/ __VactIterCount;
     QData/*47:0*/ tb_sd_init__DOT__received_command;
     QData/*47:0*/ tb_sd_init__DOT__response_data;
     QData/*47:0*/ tb_sd_init__DOT__uut_cmd__DOT__cmd_shift_reg;
-    QData/*47:0*/ tb_sd_init__DOT__uut_response__DOT__response_shift_reg;
-    QData/*47:0*/ tb_sd_init__DOT__uut_response__DOT__response_next;
     VlDelayScheduler __VdlySched;
     VlTriggerScheduler __VtrigSched_hed8007ad__0;
     VlTriggerScheduler __VtrigSched_h5163263f__0;

@@ -14,6 +14,8 @@ module SD_init (
     output reg cmd_start,
     output reg response_start,
 
+    output reg [2:0] response_type,
+
     input cmd_busy,
     input cmd_done,
 
@@ -43,11 +45,16 @@ crc7_check crc7_check_inst (
     .crc_valid(crc_valid)
 );
 
+localparam RESPONSE_R1 = 3'd0;
+localparam RESPONSE_R2 = 3'd1;
+localparam RESPONSE_R3 = 3'd2;
+localparam RESPONSE_R6 = 3'd3;
+
 localparam IDLE        = 4'd0;
 localparam CMD0        = 4'd1;
 localparam WAIT_CMD0   = 4'd2;
 localparam CMD8        = 4'd3;
-localparam WAIT_CMD8   = 4'd4;
+localparam WAIT_CMD8  = 4'd4;
 localparam WAIT_RESP8  = 4'd5;
 localparam CMD55       = 4'd6;
 localparam WAIT_CMD55  = 4'd7;
@@ -74,6 +81,7 @@ always @(posedge sd_clk) begin
 
         cmd_start <= 1'b0;
         response_start <= 1'b0;
+        response_type <= RESPONSE_R1;
 
     end
 
@@ -99,6 +107,7 @@ always @(posedge sd_clk) begin
 
                 cmd_index <= 6'd0;
                 cmd_arg <= 32'h00000000;
+                response_type <= RESPONSE_R1;
 
                 if (!cmd_busy) begin
 
@@ -121,6 +130,7 @@ always @(posedge sd_clk) begin
 
                 cmd_index <= 6'd8;
                 cmd_arg <= 32'h000001AA;
+                response_type <= RESPONSE_R1;
 
                 if (!cmd_busy) begin
 
@@ -169,6 +179,7 @@ always @(posedge sd_clk) begin
 
                 cmd_index <= 6'd55;
                 cmd_arg <= 32'h00000000;
+                response_type <= RESPONSE_R1;
 
                 if (!cmd_busy) begin
 
@@ -216,6 +227,7 @@ always @(posedge sd_clk) begin
 
                 cmd_index <= 6'd41;
                 cmd_arg <= 32'h40000000;
+                response_type <= RESPONSE_R3;
 
                 if (!cmd_busy) begin
 
@@ -237,33 +249,34 @@ always @(posedge sd_clk) begin
 
             end
 
-WAIT_RESP41: begin
+            WAIT_RESP41: begin
 
-    if (response_done) begin
+                if (response_done) begin
 
-        if ((response_cmd == 6'd41) &&
-            response_status[31]) begin
+                    if ((response_cmd == 6'd41) &&
+                        response_status[31]) begin
 
-            state <= DONE;
+                        state <= DONE;
 
-        end
+                    end
 
-        else if ((response_cmd == 6'd41) &&
-                 !response_status[31]) begin
+                    else if ((response_cmd == 6'd41) &&
+                             !response_status[31]) begin
 
-            state <= CMD55;
+                        state <= CMD55;
 
-        end
+                    end
 
-        else begin
+                    else begin
 
-            state <= ERROR;
+                        state <= ERROR;
 
-        end
+                    end
 
-    end
+                end
 
-end
+            end
+
             DONE: begin
 
                 init_done <= 1'b1;
@@ -285,6 +298,7 @@ end
 
                 cmd_start <= 1'b0;
                 response_start <= 1'b0;
+                response_type <= RESPONSE_R1;
 
             end
 

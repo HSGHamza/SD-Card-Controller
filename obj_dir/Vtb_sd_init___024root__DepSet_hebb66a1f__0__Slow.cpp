@@ -853,9 +853,25 @@ VL_ATTR_COLD void Vtb_sd_init___024root___stl_sequent__TOP__0(Vtb_sd_init___024r
     vlSelfRef.tb_sd_init__DOT__uut_init__DOT__crc_valid 
         = ((IData)(tb_sd_init__DOT__uut_init__DOT__crc7_check_inst__DOT__crc_reg) 
            == (IData)(vlSelfRef.tb_sd_init__DOT__response_crc));
-    vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_next 
-        = ((0xfffffffffffeULL & (vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg 
-                                 << 1U)) | (QData)((IData)(vlSelfRef.tb_sd_init__DOT__sd_cmd)));
+    vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_next[0U] 
+        = ((vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[0U] 
+            << 1U) | (IData)(vlSelfRef.tb_sd_init__DOT__sd_cmd));
+    vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_next[1U] 
+        = ((vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[0U] 
+            >> 0x1fU) | (vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[1U] 
+                         << 1U));
+    vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_next[2U] 
+        = ((vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[1U] 
+            >> 0x1fU) | (vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[2U] 
+                         << 1U));
+    vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_next[3U] 
+        = ((vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[2U] 
+            >> 0x1fU) | (vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[3U] 
+                         << 1U));
+    vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_next[4U] 
+        = ((vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[3U] 
+            >> 0x1fU) | (0xfeU & (vlSelfRef.tb_sd_init__DOT__uut_response__DOT__response_shift_reg[4U] 
+                                  << 1U)));
 }
 
 VL_ATTR_COLD void Vtb_sd_init___024root___eval_triggers__stl(Vtb_sd_init___024root* vlSelf);
@@ -968,6 +984,7 @@ VL_ATTR_COLD void Vtb_sd_init___024root___ctor_var_reset(Vtb_sd_init___024root* 
     vlSelf->tb_sd_init__DOT__response_status = VL_RAND_RESET_I(32);
     vlSelf->tb_sd_init__DOT__response_crc = VL_RAND_RESET_I(7);
     vlSelf->tb_sd_init__DOT__sd_cmd = VL_RAND_RESET_I(1);
+    vlSelf->tb_sd_init__DOT__response_type = VL_RAND_RESET_I(3);
     vlSelf->tb_sd_init__DOT__card_cmd_oe = VL_RAND_RESET_I(1);
     vlSelf->tb_sd_init__DOT__card_cmd_out = VL_RAND_RESET_I(1);
     vlSelf->tb_sd_init__DOT__received_command = VL_RAND_RESET_Q(48);
@@ -982,10 +999,11 @@ VL_ATTR_COLD void Vtb_sd_init___024root___ctor_var_reset(Vtb_sd_init___024root* 
     vlSelf->tb_sd_init__DOT__uut_cmd__DOT__cmd_out = VL_RAND_RESET_I(1);
     vlSelf->tb_sd_init__DOT__uut_cmd__DOT__cmd_oe = VL_RAND_RESET_I(1);
     vlSelf->tb_sd_init__DOT__uut_cmd__DOT__state = VL_RAND_RESET_I(2);
-    vlSelf->tb_sd_init__DOT__uut_response__DOT__response_shift_reg = VL_RAND_RESET_Q(48);
-    vlSelf->tb_sd_init__DOT__uut_response__DOT__counter = VL_RAND_RESET_I(6);
     vlSelf->tb_sd_init__DOT__uut_response__DOT__state = VL_RAND_RESET_I(2);
-    vlSelf->tb_sd_init__DOT__uut_response__DOT__response_next = VL_RAND_RESET_Q(48);
+    VL_RAND_RESET_W(136, vlSelf->tb_sd_init__DOT__uut_response__DOT__response_shift_reg);
+    vlSelf->tb_sd_init__DOT__uut_response__DOT__counter = VL_RAND_RESET_I(8);
+    vlSelf->tb_sd_init__DOT__uut_response__DOT__active_response_type = VL_RAND_RESET_I(3);
+    VL_RAND_RESET_W(136, vlSelf->tb_sd_init__DOT__uut_response__DOT__response_next);
     vlSelf->__Vtrigprevexpr___TOP__tb_sd_init__DOT__sd_clk__0 = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigprevexpr___TOP__tb_sd_init__DOT__cmd_busy__0 = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigprevexpr___TOP__tb_sd_init__DOT__response_start__0 = VL_RAND_RESET_I(1);
