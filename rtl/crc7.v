@@ -1,3 +1,5 @@
+`timescale 1ns/1ps
+
 module crc7 (
     input [5:0] cmd_index,
     input [31:0] cmd_arg,

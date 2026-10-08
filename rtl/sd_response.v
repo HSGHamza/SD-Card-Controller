@@ -30,21 +30,25 @@ wire [47:0] response_next = {
 always @(posedge sd_clk) begin
 
     if (reset) begin
+
         response_shift_reg <= 48'd0;
         counter <= 6'd0;
+
         response_busy <= 1'b0;
         response_done <= 1'b0;
         response_valid <= 1'b0;
+
         response_cmd <= 6'd0;
         response_status <= 32'd0;
         response_crc <= 7'd0;
+
         state <= IDLE;
+
     end
 
     else begin
 
         response_done <= 1'b0;
-        response_valid <= 1'b0;
 
         case (state)
 
@@ -54,8 +58,12 @@ always @(posedge sd_clk) begin
                 counter <= 6'd0;
 
                 if (response_start) begin
+
                     response_busy <= 1'b1;
+                    response_valid <= 1'b0;
+
                     state <= WAIT_START;
+
                 end
 
             end
@@ -63,9 +71,12 @@ always @(posedge sd_clk) begin
             WAIT_START: begin
 
                 if (cmd == 1'b0) begin
+
                     response_shift_reg <= {47'd0, 1'b0};
                     counter <= 6'd1;
+
                     state <= RECEIVE;
+
                 end
 
             end
@@ -86,10 +97,12 @@ always @(posedge sd_clk) begin
                     response_status <= response_next[39:8];
                     response_crc <= response_next[7:1];
 
-		if ((response_next[47] == 1'b0) &&
-		    (response_next[46] == 1'b1) &&
-		    (response_next[0] == 1'b1))
-		    response_valid <= 1'b1;
+                    if ((response_next[47] == 1'b0) &&
+                        (response_next[46] == 1'b1) &&
+                        (response_next[0] == 1'b1))
+                        response_valid <= 1'b1;
+                    else
+                        response_valid <= 1'b0;
 
                     counter <= 6'd0;
                     state <= IDLE;
@@ -97,7 +110,9 @@ always @(posedge sd_clk) begin
                 end
 
                 else begin
+
                     counter <= counter + 1'b1;
+
                 end
 
             end
@@ -106,12 +121,15 @@ always @(posedge sd_clk) begin
 
                 response_shift_reg <= 48'd0;
                 counter <= 6'd0;
+
                 response_busy <= 1'b0;
                 response_done <= 1'b0;
                 response_valid <= 1'b0;
+
                 response_cmd <= 6'd0;
                 response_status <= 32'd0;
                 response_crc <= 7'd0;
+
                 state <= IDLE;
 
             end

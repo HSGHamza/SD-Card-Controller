@@ -17,8 +17,8 @@ reg [5:0] counter;
 reg cmd_out;
 reg cmd_oe;
 
-localparam IDLE = 2'd0;
-localparam SEND = 2'd1;
+localparam IDLE    = 2'd0;
+localparam SEND    = 2'd1;
 localparam RELEASE = 2'd2;
 
 reg [1:0] state;
@@ -60,8 +60,10 @@ always @(posedge sd_clk) begin
                         1'b1
                     };
 
-                    cmd_busy <= 1'b1;
+                    cmd_out <= 1'b0;
                     cmd_oe <= 1'b1;
+                    cmd_busy <= 1'b1;
+                    counter <= 6'd0;
                     state <= SEND;
 
                 end
@@ -69,8 +71,6 @@ always @(posedge sd_clk) begin
             end
 
             SEND: begin
-
-                cmd_out <= cmd_shift_reg[47];
 
                 if (counter == 6'd47) begin
 
@@ -86,6 +86,7 @@ always @(posedge sd_clk) begin
                         1'b0
                     };
 
+                    cmd_out <= cmd_shift_reg[46];
                     counter <= counter + 1'b1;
 
                 end
@@ -95,6 +96,7 @@ always @(posedge sd_clk) begin
             RELEASE: begin
 
                 cmd_oe <= 1'b0;
+                cmd_out <= 1'b1;
                 cmd_done <= 1'b1;
                 counter <= 6'd0;
                 state <= IDLE;
