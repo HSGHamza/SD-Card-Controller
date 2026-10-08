@@ -33,7 +33,6 @@ reg card_cmd_out;
 reg [47:0] received_command;
 reg [47:0] response_data;
 
-integer i;
 integer acmd41_count;
 
 assign sd_cmd = card_cmd_oe ? card_cmd_out : 1'bz;
@@ -206,25 +205,25 @@ initial begin
 
             end
 
-6'd41: begin
+            6'd41: begin
 
-    acmd41_count = acmd41_count + 1;
+                acmd41_count = acmd41_count + 1;
 
-    $display("CARD: ACMD41 attempt %0d", acmd41_count);
+                $display("CARD: ACMD41 attempt %0d", acmd41_count);
 
-    if (acmd41_count == 1) begin
+                if (acmd41_count == 1) begin
 
-        send_response(48'h6900000000E5);
+                    send_response(48'h690000000001);
 
-    end
+                end
 
-    else begin
+                else begin
 
-        send_response(48'h69C000000041);
+                    send_response(48'h69C000000001);
 
-    end
+                end
 
-end
+            end
 
             default: begin
 

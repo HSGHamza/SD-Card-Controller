@@ -237,33 +237,33 @@ always @(posedge sd_clk) begin
 
             end
 
-            WAIT_RESP41: begin
+WAIT_RESP41: begin
 
-                if (response_done) begin
+    if (response_done) begin
 
-                    if (response_valid &&
-                        response_status[31]) begin
+        if ((response_cmd == 6'd41) &&
+            response_status[31]) begin
 
-                        state <= DONE;
+            state <= DONE;
 
-                    end
+        end
 
-                    else if (response_valid) begin
+        else if ((response_cmd == 6'd41) &&
+                 !response_status[31]) begin
 
-                        state <= CMD55;
+            state <= CMD55;
 
-                    end
+        end
 
-                    else begin
+        else begin
 
-                        state <= ERROR;
+            state <= ERROR;
 
-                    end
+        end
 
-                end
+    end
 
-            end
-
+end
             DONE: begin
 
                 init_done <= 1'b1;
