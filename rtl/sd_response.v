@@ -18,14 +18,15 @@ module sd_response (
     output reg [119:0] response_long
 );
 
-localparam RESPONSE_R1 = 3'd0;
-localparam RESPONSE_R2 = 3'd1;
-localparam RESPONSE_R3 = 3'd2;
-localparam RESPONSE_R6 = 3'd3;
+localparam RESPONSE_R1  = 3'd0;
+localparam RESPONSE_R2  = 3'd1;
+localparam RESPONSE_R3  = 3'd2;
+localparam RESPONSE_R6  = 3'd3;
+localparam RESPONSE_R1B = 3'd4;
 
-localparam IDLE = 2'd0;
-localparam WAIT_START = 2'd1;
-localparam RECEIVE = 2'd2;
+localparam IDLE        = 2'd0;
+localparam WAIT_START  = 2'd1;
+localparam RECEIVE     = 2'd2;
 
 reg [1:0] state;
 

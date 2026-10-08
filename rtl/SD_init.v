@@ -16,6 +16,10 @@ module SD_init (
 
     output reg [2:0] response_type,
 
+    output reg [119:0] card_cid,
+    output reg [15:0] card_rca,
+    output reg [119:0] card_csd,
+
     input cmd_busy,
     input cmd_done,
 
@@ -24,7 +28,8 @@ module SD_init (
     input response_valid,
     input [5:0] response_cmd,
     input [31:0] response_status,
-    input [6:0] response_crc
+    input [6:0] response_crc,
+    input [119:0] response_long
 );
 
 wire [6:0] crc7_value;
@@ -49,23 +54,36 @@ localparam RESPONSE_R1 = 3'd0;
 localparam RESPONSE_R2 = 3'd1;
 localparam RESPONSE_R3 = 3'd2;
 localparam RESPONSE_R6 = 3'd3;
+localparam RESPONSE_R1B = 3'd4;
 
-localparam IDLE        = 4'd0;
-localparam CMD0        = 4'd1;
-localparam WAIT_CMD0   = 4'd2;
-localparam CMD8        = 4'd3;
-localparam WAIT_CMD8  = 4'd4;
-localparam WAIT_RESP8  = 4'd5;
-localparam CMD55       = 4'd6;
-localparam WAIT_CMD55  = 4'd7;
-localparam WAIT_RESP55 = 4'd8;
-localparam ACMD41      = 4'd9;
-localparam WAIT_ACMD41 = 4'd10;
-localparam WAIT_RESP41 = 4'd11;
-localparam DONE        = 4'd12;
-localparam ERROR       = 4'd13;
+localparam IDLE        = 5'd0;
+localparam CMD0        = 5'd1;
+localparam WAIT_CMD0   = 5'd2;
+localparam CMD8        = 5'd3;
+localparam WAIT_CMD8   = 5'd4;
+localparam WAIT_RESP8  = 5'd5;
+localparam CMD55       = 5'd6;
+localparam WAIT_CMD55  = 5'd7;
+localparam WAIT_RESP55 = 5'd8;
+localparam ACMD41      = 5'd9;
+localparam WAIT_ACMD41 = 5'd10;
+localparam WAIT_RESP41 = 5'd11;
+localparam CMD2        = 5'd12;
+localparam WAIT_CMD2   = 5'd13;
+localparam WAIT_RESP2  = 5'd14;
+localparam CMD3        = 5'd15;
+localparam WAIT_CMD3   = 5'd16;
+localparam WAIT_RESP3  = 5'd17;
+localparam CMD9        = 5'd18;
+localparam WAIT_CMD9   = 5'd19;
+localparam WAIT_RESP9  = 5'd20;
+localparam CMD7        = 5'd21;
+localparam WAIT_CMD7   = 5'd22;
+localparam WAIT_RESP7  = 5'd23;
+localparam DONE        = 5'd24;
+localparam ERROR       = 5'd25;
 
-reg [3:0] state;
+reg [4:0] state;
 
 always @(posedge sd_clk) begin
 
@@ -82,6 +100,10 @@ always @(posedge sd_clk) begin
         cmd_start <= 1'b0;
         response_start <= 1'b0;
         response_type <= RESPONSE_R1;
+
+        card_cid <= 120'd0;
+        card_rca <= 16'd0;
+        card_csd <= 120'd0;
 
     end
 
@@ -256,7 +278,7 @@ always @(posedge sd_clk) begin
                     if ((response_cmd == 6'd41) &&
                         response_status[31]) begin
 
-                        state <= DONE;
+                        state <= CMD2;
 
                     end
 
@@ -277,6 +299,195 @@ always @(posedge sd_clk) begin
 
             end
 
+            CMD2: begin
+
+                cmd_index <= 6'd2;
+                cmd_arg <= 32'h00000000;
+                response_type <= RESPONSE_R2;
+
+                if (!cmd_busy) begin
+
+                    cmd_start <= 1'b1;
+                    state <= WAIT_CMD2;
+
+                end
+
+            end
+
+            WAIT_CMD2: begin
+
+                if (cmd_done) begin
+
+                    response_start <= 1'b1;
+                    state <= WAIT_RESP2;
+
+                end
+
+            end
+
+            WAIT_RESP2: begin
+
+                if (response_done) begin
+
+                    if (response_valid) begin
+
+                        card_cid <= response_long;
+                        state <= CMD3;
+
+                    end
+
+                    else begin
+
+                        state <= ERROR;
+
+                    end
+
+                end
+
+            end
+
+            CMD3: begin
+
+                cmd_index <= 6'd3;
+                cmd_arg <= 32'h00000000;
+                response_type <= RESPONSE_R6;
+
+                if (!cmd_busy) begin
+
+                    cmd_start <= 1'b1;
+                    state <= WAIT_CMD3;
+
+                end
+
+            end
+
+            WAIT_CMD3: begin
+
+                if (cmd_done) begin
+
+                    response_start <= 1'b1;
+                    state <= WAIT_RESP3;
+
+                end
+
+            end
+
+            WAIT_RESP3: begin
+
+                if (response_done) begin
+
+                    if (response_valid &&
+                        response_cmd == 6'd3) begin
+
+                        card_rca <= response_status[31:16];
+                        state <= CMD9;
+
+                    end
+
+                    else begin
+
+                        state <= ERROR;
+
+                    end
+
+                end
+
+            end
+
+            CMD9: begin
+
+                cmd_index <= 6'd9;
+                cmd_arg <= {card_rca, 16'h0000};
+                response_type <= RESPONSE_R2;
+
+                if (!cmd_busy) begin
+
+                    cmd_start <= 1'b1;
+                    state <= WAIT_CMD9;
+
+                end
+
+            end
+
+            WAIT_CMD9: begin
+
+                if (cmd_done) begin
+
+                    response_start <= 1'b1;
+                    state <= WAIT_RESP9;
+
+                end
+
+            end
+
+            WAIT_RESP9: begin
+
+                if (response_done) begin
+
+                    if (response_valid) begin
+
+                        card_csd <= response_long;
+                        state <= CMD7;
+
+                    end
+
+                    else begin
+
+                        state <= ERROR;
+
+                    end
+
+                end
+
+            end
+
+            CMD7: begin
+
+                cmd_index <= 6'd7;
+                cmd_arg <= {card_rca, 16'h0000};
+                response_type <= RESPONSE_R1B;
+
+                if (!cmd_busy) begin
+
+                    cmd_start <= 1'b1;
+                    state <= WAIT_CMD7;
+
+                end
+
+            end
+
+            WAIT_CMD7: begin
+
+                if (cmd_done) begin
+
+                    response_start <= 1'b1;
+                    state <= WAIT_RESP7;
+
+                end
+
+            end
+
+            WAIT_RESP7: begin
+
+                if (response_done) begin
+
+                    if (response_valid &&
+                        response_cmd == 6'd7) begin
+
+                        state <= DONE;
+
+                    end
+
+                    else begin
+
+                        state <= ERROR;
+
+                    end
+
+                end
+
+            end
+
             DONE: begin
 
                 init_done <= 1'b1;
@@ -284,7 +495,6 @@ always @(posedge sd_clk) begin
             end
 
             ERROR: begin
-
                 init_error <= 1'b1;
                 state <= ERROR;
             end
@@ -299,6 +509,10 @@ always @(posedge sd_clk) begin
                 cmd_start <= 1'b0;
                 response_start <= 1'b0;
                 response_type <= RESPONSE_R1;
+
+                card_cid <= 120'd0;
+                card_rca <= 16'd0;
+                card_csd <= 120'd0;
 
             end
 
