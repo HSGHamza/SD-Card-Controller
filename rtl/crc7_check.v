@@ -14,7 +14,7 @@ integer i;
 
 always @(*) begin
 
-    data = {2'b01, response_cmd, response_status};
+    data = {2'b00, response_cmd, response_status};
     crc_reg = 7'd0;
 
     for (i = 39; i >= 0; i = i - 1) begin
@@ -36,4 +36,3 @@ always @(*) begin
 end
 
 endmodule
-

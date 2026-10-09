@@ -1,6 +1,8 @@
 `timescale 1ns/1ps
 
-module sd_data_rx (
+module sd_data_rx #(
+    parameter [31:0] TOKEN_TIMEOUT_CYCLES = 32'd1000000
+) (
     input sd_clk,
     input reset,
     input start,
@@ -34,6 +36,7 @@ reg [15:0] calculated_crc;
 reg [2:0] bit_count;
 reg [8:0] byte_count;
 reg crc_byte_count;
+reg [31:0] token_timeout_count;
 
 wire [15:0] crc16_next_bit;
 
@@ -69,6 +72,7 @@ always @(posedge sd_clk) begin
         bit_count <= 3'd0;
         byte_count <= 9'd0;
         crc_byte_count <= 1'b0;
+        token_timeout_count <= 32'd0;
 
     end
 
@@ -98,6 +102,7 @@ always @(posedge sd_clk) begin
                     bit_count <= 3'd0;
                     byte_count <= 9'd0;
                     crc_byte_count <= 1'b0;
+                    token_timeout_count <= 32'd0;
 
                     state <= WAIT_TOKEN;
 
@@ -121,8 +126,27 @@ always @(posedge sd_clk) begin
                         byte_count <= 9'd0;
                         byte_shift <= 8'd0;
                         calculated_crc <= 16'd0;
+                        token_timeout_count <= 32'd0;
 
                         state <= RECEIVE;
+
+                    end
+
+                    else if (token_timeout_count == TOKEN_TIMEOUT_CYCLES - 1'b1) begin
+
+                        busy <= 1'b0;
+                        done <= 1'b1;
+                        valid <= 1'b0;
+                        crc_valid <= 1'b0;
+                        token_timeout_count <= 32'd0;
+
+                        state <= DONE;
+
+                    end
+
+                    else begin
+
+                        token_timeout_count <= token_timeout_count + 1'b1;
 
                     end
 
@@ -131,6 +155,7 @@ always @(posedge sd_clk) begin
                 else begin
 
                     bit_count <= bit_count + 1'b1;
+                    token_timeout_count <= token_timeout_count + 1'b1;
 
                 end
 

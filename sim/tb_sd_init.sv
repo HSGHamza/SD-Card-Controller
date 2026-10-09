@@ -37,6 +37,7 @@ reg [47:0] received_command;
 reg [47:0] response_data;
 
 integer acmd41_count;
+integer cmd17_count;
 
 wire [119:0] response_long;
 wire [119:0] card_cid;
@@ -172,6 +173,8 @@ task send_response;
     input [47:0] data;
 
     integer j;
+    reg [39:0] crc_data;
+    reg [6:0] crc_value;
 
     begin
 
@@ -180,6 +183,22 @@ task send_response;
         wait (response_busy == 1'b1);
 
         response_data = data;
+        response_data[46] = 1'b0;
+        crc_data = {
+            2'b00,
+            response_data[45:40],
+            response_data[39:8]
+        };
+        crc_value = 7'd0;
+
+        for (j = 39; j >= 0; j = j - 1) begin
+            if (crc_data[j] ^ crc_value[6])
+                crc_value = {crc_value[5:0], 1'b0} ^ 7'b0001001;
+            else
+                crc_value = {crc_value[5:0], 1'b0};
+        end
+
+        response_data[7:1] = crc_value;
 
         @(negedge sd_clk);
 
@@ -345,6 +364,7 @@ initial begin
     response_data = 48'd0;
 
     acmd41_count = 0;
+    cmd17_count = 0;
     read_byte_count = 0;
     read_data_errors = 0;
     sent_data_crc = 16'd0;
@@ -414,6 +434,8 @@ initial begin
             end
 
             6'd17: begin
+
+                cmd17_count = cmd17_count + 1;
 
                 $display("CARD: CMD17");
 
@@ -497,6 +519,7 @@ $display("         SD INITIALIZATION RESULT");
 $display("========================================");
 
 $display("ACMD41 Attempts = %0d", acmd41_count);
+$display("CMD17 Commands  = %0d", cmd17_count);
 
 $display("Response CMD    = %d", response_cmd);
 $display("Response Status = %h", response_status);
@@ -510,11 +533,12 @@ $display("Read data errors= %0d", read_data_errors);
 $display("Transmitted CRC = %04h", sent_data_crc);
 
 if (init_done &&
-    (read_byte_count == 512) &&
+    (cmd17_count == 0) &&
+    (read_byte_count == 0) &&
     (read_data_errors == 0)) begin
 
     $display("");
-    $display("SD CARD READY");
+    $display("SD CARD INITIALIZED");
     $display("SD INIT PASSED");
 
 end

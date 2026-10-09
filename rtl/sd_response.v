@@ -147,7 +147,7 @@ always @(posedge sd_clk) begin
                         response_crc <= response_next[7:1];
 
                         if ((response_next[47] == 1'b0) &&
-                            (response_next[46] == 1'b1) &&
+                            (response_next[46] == 1'b0) &&
                             (response_next[0] == 1'b1))
                             response_valid <= 1'b1;
                         else

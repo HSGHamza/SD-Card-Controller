@@ -485,7 +485,7 @@ always @(posedge sd_clk) begin
                     if (response_valid &&
                         response_cmd == 6'd7) begin
 
-                        state <= CMD17;
+                        state <= DONE;
 
                     end
 
